@@ -19,14 +19,14 @@ if [ ! -n "$findResult" ]; then
     localpath="$localDir/$(date "+%Y-%m-%d")-$filename"
     curl --output $localpath -H 'Cache-Control: no-cache' $imgurl
 
-    des=$(expr "$(echo "$html" | grep "id=\"sh_cp\" class=\"sc_light\"")" : '.*id=\"sh_cp\".*title=\"\(.*\)\" aria-label=\"主页图片信息\"')
+    des=$(expr "$(echo "$html" | perl -nle 'print $& if /(?<="Description":").*?(?=",)/')")
 
     osascript -e "                              \
         tell application \"System Events\" to   \
             tell every desktop to               \
                 set picture to \"$localpath\""
     osascript -e "display notification \"$des\" with title \"BingWallpaper\""
-    echo "$(date +"%Y-%m-%d %H:%M:%S") Downloaded $filename" >> $log
+    echo "$(date +"%Y-%m-%d %H:%M:%S") Downloaded $filename $des"  >> $log
 else
     echo "$(date +"%Y-%m-%d %H:%M:%S") Exist" >> $log
     exit 0
